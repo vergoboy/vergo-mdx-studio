@@ -1,0 +1,10 @@
+{
+  "id": "vergo-mdx-studio",
+  "name": "Vergo MDX Studio",
+  "version": "1.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Write MDX, preview it like arman-hosseini.ir, compile it and send it with its media for approval.",
+  "author": "Arman Hosseini",
+  "authorUrl": "https://arman-hosseini.ir",
+  "isDesktopOnly": false
+}
