@@ -1,0 +1,28 @@
+node_modules/
+main.js
+*.log
+ignore/
+
+# Secrets & credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+credentials*.json
+secrets/
+
+# Build output & caches
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
