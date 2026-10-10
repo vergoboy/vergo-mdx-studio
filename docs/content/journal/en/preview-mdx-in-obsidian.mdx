@@ -1,0 +1,74 @@
+---
+title: "How to preview MDX in Obsidian like the live site"
+date: "2026-10-10"
+updated: "2026-10-10"
+lang: "en"
+slug: "preview-mdx-in-obsidian"
+translationKey: "preview-mdx-in-obsidian"
+tags: ["obsidian", "mdx", "workflow"]
+summary: "To preview MDX in Obsidian the way the site renders it, compile with the same MDX compiler and render into the site's own page shell and stylesheet — not a generic Markdown viewer."
+seoTitle: "How to preview MDX in Obsidian like the live site"
+seoDescription: "Preview MDX in Obsidian accurately by reusing the site's compiler, page shell and stylesheet, and catch SEO and media problems before you send a page."
+keywords: ["preview mdx in obsidian", "obsidian mdx preview", "obsidian plugin mdx", "mdx frontmatter preview", "site preview obsidian"]
+schemaType: "TechArticle"
+faq:
+  - q: "Why is the default Obsidian preview not enough for MDX files?"
+    a: "A generic Markdown preview does not run MDX expressions, does not know the site's components, and does not apply the site's stylesheet or frontmatter-driven layout, so what you see can differ from the published page."
+  - q: "How do you keep the preview and the published page the same?"
+    a: "Compile the note with the same MDX compiler the site build uses, then render the result inside the site's page shell with its stylesheet. Reusing both the compiler and the layout is what keeps them equal."
+  - q: "Can you preview a page offline?"
+    a: "Yes. Keep a bundled copy of the site stylesheet and fall back to it when the live stylesheet is unavailable or does not match the current design."
+  - q: "What should be checked before publishing?"
+    a: "Title and summary length, missing image alt text, an unwanted H1, the language field, and whether every referenced media file exists — the same checks a dashboard SEO panel would apply."
+---
+
+If you write MDX for a website inside Obsidian, the preview you get by default is not the page you will publish. This article explains what it takes to make an Obsidian preview match the live rendering, and which checks are worth running before a page leaves your vault. It is written for authors and developers who keep content in Obsidian and publish to a static site.
+
+## Why is a normal Markdown preview not enough for MDX?
+
+An ordinary Markdown preview treats the file as plain text. MDX is different: `<` and `{` are code, the frontmatter drives a layout, and the site may expose its own components. Miss any of those and the preview quietly disagrees with the published page.
+
+The practical fix is to reuse the site's own pipeline rather than approximate it. Vergo MDX Studio compiles each note with the same `@mdx-js/mdx` compiler the site build runs and enables GFM, so tables and the exact error positions match.
+
+## How do you make the preview match the published page?
+
+Two things have to be reused, not reimplemented: the compiler and the layout.
+
+1. Compile the note with the site's compiler to get the same HTML, including how it handles expressions and components.
+2. Render that HTML into a small rebuild of the site's entry page — title, Quick answer, tags, table of contents and FAQ taken from the frontmatter.
+3. Apply the site's stylesheet, and set direction from the `lang` field so RTL and LTR are correct.
+
+The plugin does this in a side pane. Because the layout is rebuilt from the same frontmatter keys the site reads, the Quick-answer box, tags and FAQ appear in the preview exactly where they will appear after approval.
+
+## What can you check before a page is published?
+
+Preview is only half of it. The useful second half is a pre-flight check that runs the rules a dashboard would run, so nothing broken reaches the server.
+
+| Check | Why it matters |
+| --- | --- |
+| Title 30–60 characters | Longer titles are truncated in results |
+| Summary 70–165 characters | It becomes the Quick answer and the meta description |
+| No H1 in the body | The title is already the page's H1 |
+| Image alt text | Empty alt fails basic accessibility |
+| `lang` is `en` or `fa` | Drives direction and the language switch |
+| Media exists in the vault | A missing file blocks sending |
+
+The same page also reports MDX compile errors with the exact line and column, and explains the two most common causes: a `<` that MDX reads as a tag, and a `{` that MDX reads as a JavaScript expression.
+
+## How should media be handled before sending?
+
+Collect every local reference — Markdown images, HTML `src` and `poster`, and the `image` frontmatter key — hash each file by content, and upload only what the server does not already have. Keeping names content-addressed means the same image is never uploaded twice, and the page can reference a stable `/media/studio/<hash>.<ext>` URL.
+
+<Callout type="note" title="Approval is the last step">
+Compiling and sending only prepares a submission. The page becomes live when a human approves it, which is what keeps a fast preview from turning into an accidental publish.
+</Callout>
+
+## What should you remember?
+
+- Make an accurate MDX preview by reusing the site's compiler and layout, not by approximating them.
+- Keep a bundled stylesheet so the preview works offline and never renders unstyled.
+- Run length, alt-text, H1, language and media checks before sending anything.
+- Hash media by content and upload only what the server lacks.
+- Treat sending as a submission for approval, not a publish.
+
+To see the tool that puts this together, read about [Vergo MDX Studio](/en/projects/vergo-mdx-studio/). You can also see [more about the author and the site](/en/about/) or browse the rest of the [journal](/en/journal/).

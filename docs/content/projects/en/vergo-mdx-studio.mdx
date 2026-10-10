@@ -1,0 +1,83 @@
+---
+title: "Write MDX in Obsidian with a live site preview"
+date: "2026-10-10"
+lang: "en"
+slug: "vergo-mdx-studio"
+translationKey: "vergo-mdx-studio"
+tagline: "Obsidian plugin for site-ready MDX"
+summary: "Vergo MDX Studio is an Obsidian plugin that lets you write MDX, preview it with the target site's own stylesheet, compile it with the same compiler the site uses, and send the page with its media for approval."
+seoTitle: "Obsidian MDX preview plugin for Astro sites"
+seoDescription: "Vergo MDX Studio previews and compiles site-ready MDX in Obsidian, runs SEO checks, and sends pages with their media for approval before anything goes live."
+keywords: ["obsidian mdx plugin", "preview mdx in obsidian", "write mdx for astro site", "obsidian plugin typescript", "mdx compile preview"]
+tags: ["obsidian", "mdx", "typescript", "astro"]
+highlights: ["Previews MDX with the site's own stylesheet", "Compiles with the same @mdx-js/mdx compiler the site runs", "Uploads only the media the server lacks, then submits for approval"]
+links:
+  - { label: "Source code", href: "https://github.com/vergoboy/vergo-mdx-studio" }
+schemaType: "SoftwareSourceCode"
+faq:
+  - q: "What is Vergo MDX Studio?"
+    a: "It is an Obsidian plugin that writes, previews and compiles website-ready MDX in your vault. It sends the finished page, with its images and videos, to a site's approval Inbox instead of publishing directly."
+  - q: "Does it publish automatically?"
+    a: "No. Sending only creates a submission. The page is compiled again by the server and stays invisible until a human approves it in the dashboard Inbox."
+  - q: "What does it not do?"
+    a: "It does not host a site, does not manage the server, and does not publish on its own. It also cannot use arbitrary MDX imports — only the site's built-in components are allowed."
+  - q: "What is the license?"
+    a: "MIT. The full source is on GitHub at github.com/vergoboy/vergo-mdx-studio."
+---
+
+Writing website content from inside a notes app usually means guessing how the editor's Markdown will turn into the page that actually ships. Vergo MDX Studio removes the guesswork for authors who publish MDX to a static site: the preview, the compiler and the pre-flight checks all run inside Obsidian, and the final step is a review, never a silent publish.
+
+## How do you write site-ready MDX inside Obsidian?
+
+Run the **New MDX note** command or right-click a folder and pick it. The plugin asks for a title and a language, then creates a `.mdx` file with the correct frontmatter and opens it in the normal editor. From there you write Markdown and the site's own components, and `.mdx` files behave like any other note in the vault.
+
+The preview side pane follows what you type. It rebuilds the page shell the site uses — title, Quick-answer box, tags, table of contents, FAQ and reading time — so the result looks like the published entry rather than a generic Markdown render.
+
+## How does the preview match the live site?
+
+The pane renders into an iframe using the website's own class names and stylesheet. By default the plugin fetches the live stylesheet and uses it only when it already matches the current design; otherwise, or when offline, it falls back to a bundled snapshot, so the preview is never unstyled. Direction (RTL/LTR) comes from the `lang` frontmatter, and a toolbar toggle switches dark and light.
+
+Compilation uses the same compiler the site build runs, with GFM enabled. When something fails, the error is reported at the exact file line and column with a plain-language hint — for example, that MDX reads a bare `<` as the start of a JSX tag.
+
+## What gets validated before a page is sent?
+
+Before anything is uploaded, the plugin applies the same kind of checks the dashboard uses:
+
+| Check | What it looks at |
+| --- | --- |
+| Title length | 30–60 characters for search results |
+| Summary | 70–165 characters, used as the Quick answer |
+| Body | flags an unwanted H1 and empty image alt text |
+| Frontmatter | `lang` must be `en` or `fa` |
+| Media | every referenced file exists in the vault |
+| Compile | an error disables sending until it is fixed |
+
+Only the site's built-in components are accepted, and expressions that use server APIs are rejected, mirroring the server's own policy so problems surface in the editor first.
+
+## How does media reach the server?
+
+References are collected from Markdown images, HTML/JSX `src` and `poster` attributes, and the `image` frontmatter key. Each file is hashed, the plugin asks the server which names are missing, and only those are uploaded. The references are then rewritten to `/media/studio/<hash>.<ext>` before the page is submitted.
+
+<Callout type="tip" title="Nothing is live until you approve it">
+The server stores the submission and re-compiles the MDX. Staged media is moved into the public assets only when you approve the page in the dashboard Inbox.
+</Callout>
+
+## How do you install and run it locally?
+
+Copy `main.js`, `manifest.json` and `styles.css` into `<vault>/.obsidian/plugins/vergo-mdx-studio/`, then reload Obsidian. To build from source you need Node.js 22 or newer:
+
+```bash
+git clone https://github.com/vergoboy/vergo-mdx-studio.git
+cd vergo-mdx-studio
+npm install
+npm run build      # typecheck + production bundle -> main.js
+npm test           # vitest run
+```
+
+The plugin requires Obsidian 1.5.0 or newer and a Studio token from the site's dashboard, entered under Settings ▸ Vergo MDX Studio.
+
+## Who maintains it, and how can you contribute?
+
+The plugin is maintained by Arman Hosseini and released under the MIT license. Issues and pull requests are welcome on the [source repository](https://github.com/vergoboy/vergo-mdx-studio).
+
+Related reading: [how to preview MDX in Obsidian like the live site](/en/journal/preview-mdx-in-obsidian/), more about the [author and the site](/en/about/), and the rest of the [journal](/en/journal/).
